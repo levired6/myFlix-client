@@ -13,8 +13,14 @@
   "license": "ISC",
   "author": "levired6",
   "type": "commonjs",
-  
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.14.4"
   }
 }
