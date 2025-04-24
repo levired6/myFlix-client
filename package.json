@@ -14,7 +14,8 @@
   "author": "levired6",
   "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build":  "parcel build index.jsx --dist-dir build"
   },
   "dependencies": {
     "react": "^19.1.0",
