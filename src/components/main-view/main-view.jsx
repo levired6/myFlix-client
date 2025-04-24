@@ -69,7 +69,7 @@ export const MainView = () => {
 
   if (selectedMovie) {
     return (
-      <MovieView movies={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
+      <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
     );
   }
 
@@ -79,12 +79,12 @@ export const MainView = () => {
 
   return (
     <div>
-      {movies.map((book) => (
-        <BookCard
-          key={book.id}
-          book={book}
-          onBookClick={(newSelectedMovie) => {
-            setSelectedMovie(newSelectedMovie);
+      {movies.map((movie) => (
+        <MovieCard
+          key={movie._.id.$oid}
+          movie={movie}
+          onBookClick={(selectedMovie) => {
+            setSelectedMovie(SelectedMovie);
           }}
         />
       ))}
