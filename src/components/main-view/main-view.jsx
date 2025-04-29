@@ -10,13 +10,13 @@ export const MainView = () => {
   useEffect(() => {
     fetch("https://oscars2025-f0070acec0c4.herokuapp.com/movies")
       .then(response => {
-        if (response.ok) {// Logic error: response.ok is true for successful responses
+        if (!response.ok) {// Logic error: response.ok is true for successful responses
           throw new Error("HTTP error! status: ${response.status}");
         }
         return response.json();
       })
       .then(data => {
-        setMovies(data);
+        setmovies(data);
       })
       .catch(error => {
         console.error("Error fetching movies:", error);
@@ -35,13 +35,16 @@ export const MainView = () => {
 
   return (
     <div>
-      {movies.map((movie) => (
-        <MovieCard
-          key={movie._id.$oid}
-          movie={movie}
-          onMovieClick={setSelectedMovie}
-          />        
-      ))}
+      {movies.map((movie, index) => { // Include the index
+        const keyProp = movie._id?.$oid || index.toString(); // Fallback to index if _id is missing
+        return (
+          <MovieCard
+            key={keyProp}
+            movie={movie}
+            onMovieClick={setSelectedMovie}
+          />
+        );
+      })}
     </div>
   );
 };

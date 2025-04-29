@@ -15,7 +15,7 @@ export const MovieCard = ({ movie, onMovieClick }) => {
     movie: PropTypes.shape({
       _id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
-      // Add other expected properties based on your API response
+      // Add other properties as needed.
     }).isRequired,
     onMovieClick: PropTypes.func.isRequired,
   };
