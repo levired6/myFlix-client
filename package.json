@@ -15,9 +15,10 @@
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build":  "parcel build index.jsx --dist-dir build"
+    "build": "parcel build index.jsx --dist-dir build"
   },
   "dependencies": {
+    "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
