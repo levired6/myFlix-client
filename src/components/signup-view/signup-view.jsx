@@ -78,8 +78,8 @@ export const SignupView = () => {
           Birthday:
           <input
             type="date"
-            value={birthday}
-            onChange={(e) => setBirthday(e.target.value)}
+            value={birthdate}
+            onChange={(e) => setBirthdate(e.target.value)}
             required
           />
         </label>
