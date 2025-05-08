@@ -4,6 +4,7 @@ import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
 import { SignupView } from "../signup-view/signup-view";
+import { Row, Col, Container, Button } from "react-bootstrap"; // Import Bootstrap components
 
 export const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -46,62 +47,79 @@ export const MainView = () => {
 
   if (!user) {
     return (
-      <div>
-        {!showSignup ? (
-          <LoginView
-            onLoggedIn={(user, newToken) => {
-              setUser(user);
-              setToken(newToken);
-            }}
-          />
-        ) : (
-          <SignupView />
-        )}
-        {!showSignup ? (
-          <p>
-            Not a user? <button onClick={() => setShowSignup(true)}>Sign up</button>
-          </p>
-        ) : (
-          <p>
-            Already a user? <button onClick={() => setShowSignup(false)}>Log in</button>
-          </p>
-        )}
-      </div>
+      <Container className="mt-5">
+        <Row className="justify-content-md-center">
+          <Col md={6}>
+            {!showSignup ? (
+              <LoginView
+                onLoggedIn={(user, newToken) => {
+                  setUser(user);
+                  setToken(newToken);
+                }}
+              />
+            ) : (
+              <SignupView />
+            )}
+            <p className="mt-3 text-center">
+              {!showSignup ? (
+                <>
+                  Not a user? <Button variant="link" onClick={() => setShowSignup(true)}>Sign up</Button>
+                </>
+              ) : (
+                <>
+                  Already a user? <Button variant="link" onClick={() => setShowSignup(false)}>Log in</Button>
+                </>
+              )}
+            </p>
+          </Col>
+        </Row>
+      </Container>
     );
   }
 
   if (selectedMovie) {
     return (
-      <div>
-        <button onClick={handleLogout}>Logout</button>
-        <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
-      </div>
+      <Container className="mt-5">
+        <Row>
+          <Col md={{ span: 8, offset: 2 }}>
+            <Button variant="outline-secondary" onClick={handleLogout} className="mb-3">Logout</Button>
+            <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
+          </Col>
+        </Row>
+      </Container>
     );
   }
 
   if (movies.length === 0) {
     return (
-      <div>
-        <button onClick={handleLogout}>Logout</button>
-        <div>Loading movies...</div>
-      </div>
+      <Container className="mt-5">
+        <Row>
+          <Col md={{ span: 6, offset: 3 }} className="text-center">
+            <Button variant="outline-secondary" onClick={handleLogout} className="mb-3">Logout</Button>
+            <div>Loading movies...</div>
+          </Col>
+        </Row>
+      </Container>
     );
   }
 
   return (
-    <div>
-      <button onClick={handleLogout}>Logout</button>
-      {movies.map((movie, index) => {
-        const keyProp = movie._id?.$oid || index.toString();
-        return (
-          <MovieCard
-            key={keyProp}
-            movie={movie}
-            onMovieClick={setSelectedMovie}
-          />
-        );
-      })}
-    </div>
+    <Container className="mt-4">
+      <Button variant="outline-secondary" onClick={handleLogout} className="mb-3">Logout</Button>
+      <Row xs={1} md={3} lg={4} className="g-4">
+        {movies.map((movie, index) => {
+          const keyProp = movie._id?.$oid || index.toString();
+          return (
+            <Col key={keyProp}>
+              <MovieCard
+                movie={movie}
+                onMovieClick={setSelectedMovie}
+              />
+            </Col>
+          );
+        })}
+      </Row>
+    </Container>
   );
 };
 
