@@ -47,7 +47,7 @@ export const MainView = () => {
 
   if (!user) {
     return (
-      <Container className="mt-5">
+      <Container className="mt-5 bg-dark text-white p-4 rounded">
         <Row className="justify-content-md-center">
           <Col md={6}>
             {!showSignup ? (
