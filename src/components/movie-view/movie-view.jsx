@@ -1,34 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Card from 'react-bootstrap/Card'
+import Button from 'react-bootstrap/Button';
+import Col from 'react-bootstrap/Col';
 
 export const MovieView = ({ movie, onBackClick }) => {
   return (
-    <div>
-      <div>
-        <img src={movie.imageURL} alt={movie.title} />
-      </div>
-      <div>
-        <span>Title: </span>
-        <span>{movie.title}</span>
-      </div>
-      <div>
-        <span>Director: </span>
-        <span>{movie.director ? movie.director.name : 'N/A'}</span>
-      </div>
-      <div>
-        <span>Genre: </span>
-        <span>{movie.genre ? movie.genre.name : 'N/A'}</span>
-      </div>
-      <div>
-        <span>Description: </span>
-        <span>{movie.description}</span>
-      </div>
-      <div>
-        <span>Rating: </span>
-        <span>{movie.rating || 'N/A'}</span>
-      </div>
-      <button onClick={onBackClick}>Back</button>
-    </div>
+    <Card>
+      <Row className="g-0">
+        <Col md={4}>
+          <Card.Img src={movie.imageURL} alt={movie.title} style={{ objectFit: 'cover', height: '300px' }} />
+        </Col>
+        <Col md={8}>
+          <Card.Body>
+            <Card.Title>{movie.title}</Card.Title>
+            <Card.Text>
+              <strong>Description:</strong> {movie.description}
+            </Card.Text>
+            <Card.Text>
+              <strong>Director:</strong> {movie.director ? movie.director.name : 'N/A'}
+            </Card.Text>
+            <Card.Text>
+              <strong>Genre:</strong> {movie.genre ? movie.genre.name : 'N/A'}
+            </Card.Text>
+            <Card.Text>
+              <strong>Rating:</strong> {movie.rating || 'N/A'}
+            </Card.Text>
+            <Button variant="outline-secondary" onClick={onBackClick}>Back</Button>
+          </Card.Body>
+        </Col>
+      </Row>
+    </Card>
   );
 };
 
