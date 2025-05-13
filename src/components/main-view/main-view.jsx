@@ -1,35 +1,21 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from 'prop-types';
 import { MovieCard } from "../movie-card/movie-card";
-import { MovieView } from "../movie-view/movie-view";
-import { LoginView } from "../login-view/login-view";
-import { SignupView } from "../signup-view/signup-view";
+import { Link, useNavigate } from "react-router-dom";
 import { Row, Col, Container, Button } from "react-bootstrap"; // Import Bootstrap components
 
 export const MainView = () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
   const storedToken = localStorage.getItem("token");
-  const [user, setUser] = useState(storedUser ? storedUser : null);
-  const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  const [showSignup, setShowSignup] = useState(false); // State to control which auth view is shown
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    setUser(null);
-    setToken(null);
-    setShowSignup(false); // Reset to login view on logout
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token) {
+    if (!storedToken) {
+      navigate('/login'); //redirect to login if no token
       return;
     }
 
     fetch("https://oscars2025-f0070acec0c4.herokuapp.com/movies", {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${storedToken}` },
     })
       .then((response) => {
         if (!response.ok) {
@@ -43,52 +29,13 @@ export const MainView = () => {
       .catch((error) => {
         console.error("Error fetching movies:", error);
       });
-  }, [token]);
+  }, [storedToken, navigate]);
 
-  if (!user) {
-    return (
-      <Container className="mt-5 bg-dark text-white p-4 rounded">
-        <Row className="justify-content-md-center">
-          <Col md={6}>
-            {!showSignup ? (
-              <LoginView
-                onLoggedIn={(user, newToken) => {
-                  setUser(user);
-                  setToken(newToken);
-                }}
-              />
-            ) : (
-              <SignupView />
-            )}
-            <p className="mt-3 text-center">
-              {!showSignup ? (
-                <>
-                  Not a user? <Button variant="link" onClick={() => setShowSignup(true)}>Sign up</Button>
-                </>
-              ) : (
-                <>
-                  Already a user? <Button variant="link" onClick={() => setShowSignup(false)}>Log in</Button>
-                </>
-              )}
-            </p>
-          </Col>
-        </Row>
-      </Container>
-    );
-  }
-
-  if (selectedMovie) {
-    return (
-      <Container className="mt-5">
-        <Row>
-          <Col md={{ span: 8, offset: 2 }}>
-            <Button variant="outline-secondary" onClick={handleLogout} className="mb-3">Logout</Button>
-            <MovieView movie={selectedMovie} onBackClick={() => setSelectedMovie(null)} />
-          </Col>
-        </Row>
-      </Container>
-    );
-  }
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate('/login');
+  };
 
   if (movies.length === 0) {
     return (
@@ -113,7 +60,6 @@ export const MainView = () => {
             <Col key={keyProp}>
               <MovieCard
                 movie={movie}
-                onMovieClick={setSelectedMovie}
               />
             </Col>
           );
@@ -121,6 +67,6 @@ export const MainView = () => {
       </Row>
     </Container>
   );
-};
+}; 
 
 MainView.propTypes = {};

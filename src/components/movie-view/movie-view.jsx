@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import Card from 'react-bootstrap/Card'
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import { Link } from 'react-router-dom'; //Import Link
 
-export const MovieView = ({ movie, onBackClick }) => {
+export const MovieView = ({ movie }) => { 
   return (
     <Card>
       <Row className="g-0">
@@ -26,7 +28,7 @@ export const MovieView = ({ movie, onBackClick }) => {
             <Card.Text>
               <strong>Rating:</strong> {movie.rating || 'N/A'}
             </Card.Text>
-            <Button variant="outline-secondary" onClick={onBackClick}>Back</Button>
+            <Link to="/" className="btn btn-outline-secondary">Back</Link>
           </Card.Body>
         </Col>
       </Row>
@@ -51,5 +53,4 @@ MovieView.propTypes = {
     imageURL: PropTypes.string,
     rating: PropTypes.string,
   }).isRequired,
-  onBackClick: PropTypes.func.isRequired,
 };
