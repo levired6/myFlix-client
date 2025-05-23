@@ -1,35 +1,106 @@
-import React from 'react'; // Import React
+import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import Container from 'react-bootstrap/Container'; // Import Container
-import { BrowserRouter, Routes, Route } from 'react-router-dom'; // Import BrowserRouter, Routes, and Route
+import Container from 'react-bootstrap/Container';
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 
-// Import statement to indicate that you need to bundle `./index.scss`
 import "./index.scss";
-import { MainView } from './components/main-view/main-view'; // Import MainView
-import { LoginView } from './components/login-view/login-view'; // Import LoginView
-import { SignupView } from './components/signup-view/signup-view'; // Import SignupView
-import { MovieView } from './components/movie-view/movie-view'; // Import MovieView
-import { ProfileView } from './components/profile-view/profile-view'; // Import profileView
-import { NavigationBar } from './components/navigation-bar/navigation-bar'; // Import NavigationBar
+import { MainView } from './components/main-view/main-view';
+import { LoginView } from './components/login-view/login-view';
+import { SignupView } from './components/signup-view/signup-view';
+import { MovieView } from './components/movie-view/movie-view';
+import { ProfileView } from './components/profile-view/profile-view';
+import { NavigationBar } from './components/navigation-bar/navigation-bar';
 
-// Main component (will eventually use all the others)
 const MyFlixApplication = () => {
-  return (
-    <BrowserRouter>
-      <NavigationBar /> {/* Navigation bar at the top */}
-      <Container className="my-flix"> {/* Use Bootstrap Container */}
-        <Routes>
-          <Route path="/login" element={<LoginView />} />
-          <Route path="/signup" element={<SignupView />} />
-          <Route path="/" element={<MainView />} /> {/*Main movie list at the root path */}
-          <Route path="/movies/:movieId" element={<MovieView />} /> {/* Movie details */}
-          <Route path="/profile" element={<ProfileView />} /> {/* User profile */}
-        </Routes>
-      </Container>
-    </BrowserRouter>
-  );
+    const [user, setUser] = useState(() => {
+        const storedUser = localStorage.getItem('user');
+        return storedUser ? JSON.parse(storedUser) : null;
+    });
+    const [token, setToken] = useState(() => localStorage.getItem('token') || null);
+    
+    const navigate = useNavigate();
+
+    const handleLogin = (userData, tokenData) => {
+        setUser(userData);
+        setToken(tokenData);
+        // localStorage.setItem for user and token are already handled in LoginView before this callback.
+        // Navigation is also handled by LoginView.
+    };
+
+    // New function to update user state from child components
+    const handleUserUpdate = (updatedUserData) => {
+        setUser(updatedUserData);
+        localStorage.setItem('user', JSON.stringify(updatedUserData)); // Keep localStorage in sync
+    };
+
+    const handleLogout = () => {
+        setToken(null);
+        setUser(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/login');
+    };
+
+    return (
+        <>
+            <NavigationBar onLogout={handleLogout} user={user} />
+            <Container className="my-flix">
+                <Routes>
+                    <Route path="/login" element={<LoginView onLoggedIn={handleLogin} />} />
+                    <Route path="/signup" element={<SignupView />} />
+
+                    {/* Conditional rendering based on `token` state from MyFlixApplication */}
+                    <Route
+                        path="/"
+                        element={token ? (
+                            <MainView
+                                user={user}
+                                token={token}
+                                onUserUpdate={handleUserUpdate} // Pass onUserUpdate
+                                onLoggedOut={handleLogout}     // Pass onLoggedOut
+                            />
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )}
+                    />
+                    <Route
+                        path="/movies/:movieId"
+                        // Pass the handleUserUpdate function to MovieView
+                        element={token ? (
+                            <MovieView
+                                user={user}
+                                token={token}
+                                onUserUpdate={handleUserUpdate}
+                                onLoggedOut={handleLogout} // Also pass onLoggedOut to MovieView for consistency (e.g., if it has its own fetch that could trigger a 401)
+                            />
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )}
+                    />
+                    <Route
+                        path="/profile"
+                        // Pass the handleUserUpdate function to ProfileView as well
+                        element={token ? (
+                            <ProfileView
+                                user={user}
+                                token={token}
+                                onUserUpdate={handleUserUpdate}
+                                onLoggedOut={handleLogout}
+                            />
+                        ) : (
+                            <Navigate to="/login" replace />
+                        )}
+                    />
+                </Routes>
+            </Container>
+        </>
+    );
 };
 
 const container = document.querySelector("#root");
 const root = createRoot(container);
-root.render(<MyFlixApplication />);
+root.render(
+    <BrowserRouter>
+        <MyFlixApplication />
+    </BrowserRouter>
+);
