@@ -100,7 +100,7 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
             email: email,
             birthday: birthday // This will be an empty string if not set, which is fine for optional.
         };
-        
+
         // Only include password if it's not empty, as backend allows it to be optional.
         if (password) {
             updatedData.password = password;
@@ -245,7 +245,15 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
                                     {/* FIX 8: Change profileUser.Username to profileUser.username (and for Email, Birthday) */}
                                     <Card.Text><strong>Username:</strong> {profileUser.username}</Card.Text>
                                     <Card.Text><strong>Email:</strong> {profileUser.email}</Card.Text>
-                                    <Card.Text><strong>Birthday:</strong> {profileUser.birthday ? new Date(profileUser.birthday).toLocaleDateString() : 'N/A'}</Card.Text>
+                                    <Card.Text><strong>Birthday:</strong> {profileUser.birthday ?
+                                            new Date(profileUser.birthday.split('T')[0] + 'T00:00:00').toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: '2-digit',
+                                                day: '2-digit',
+                                                timeZone: 'UTC' // Crucially, tell it to format as if it's UTC
+                                            })
+                                            : 'N/A'
+                                        }</Card.Text>
                                     <Button variant="primary" onClick={handleEditClick} className="me-2">Edit Profile</Button>
                                     <Button variant="danger" onClick={handleDeleteUser}>Deregister Account</Button>
                                 </>
