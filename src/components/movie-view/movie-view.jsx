@@ -6,6 +6,8 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = 'https://oscars2025-f0070acec0c4.herokuapp.com';
+
 // Accept user, token, AND onUserUpdate as props
 export const MovieView = ({ user, token, onUserUpdate }) => {
     const { movieId } = useParams();
@@ -24,7 +26,7 @@ export const MovieView = ({ user, token, onUserUpdate }) => {
             return;
         }
 
-        fetch(`https://oscars2025-f0070acec0c4.herokuapp.com/movies/${movieId}`, {
+        fetch(`${API_BASE_URL}/movies/${movieId}`, { // Using API_BASE_URL for movie fetch
             headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -41,8 +43,8 @@ export const MovieView = ({ user, token, onUserUpdate }) => {
         .then((data) => {
             setMovie(data);
             // After fetching movie, check if it's a favorite
-            if (user && user.FavoriteMovies && data) {
-                setIsFavorite(user.FavoriteMovies.includes(data._id?.$oid || data._id));
+            if (user && user.favoriteMovies && data) {
+                setIsFavorite(user.favoriteMovies.includes(data._id?.$oid || data._id));
             }
         })
         .catch((error) => {
@@ -73,7 +75,7 @@ export const MovieView = ({ user, token, onUserUpdate }) => {
             return response.json();
         })
         .then((updatedUser) => {
-            // *** THE KEY CHANGE IS HERE ***
+            
             // Instead of just localStorage.setItem, also call the prop to update parent state
             localStorage.setItem('user', JSON.stringify(updatedUser));
             if (onUserUpdate) { // Only call if the prop is provided
@@ -96,7 +98,11 @@ export const MovieView = ({ user, token, onUserUpdate }) => {
         <Card className="mt-4">
             <Row className="g-0">
                 <Col md={4}>
-                    <Card.Img src={movie.imageURL} alt={movie.title} style={{ objectFit: 'cover', height: '300px' }} />
+                    <Card.Img
+                        src={`${API_BASE_URL}/images/${movie.imageURL}`} // Construct the full URL for the image
+                        alt={movie.title}
+                        style={{ objectFit: 'cover', height: '300px' }}
+                    />
                 </Col>
                 <Col md={8}>
                     <Card.Body>
@@ -130,5 +136,5 @@ export const MovieView = ({ user, token, onUserUpdate }) => {
 MovieView.propTypes = {
     user: PropTypes.object,
     token: PropTypes.string,
-    onUserUpdate: PropTypes.func, // Add this propType
+    onUserUpdate: PropTypes.func,
 };

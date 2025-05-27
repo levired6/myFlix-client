@@ -4,9 +4,10 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
+const API_BASE_URL = 'https://oscars2025-f0070acec0c4.herokuapp.com';
+
 export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
-    // Initialize isFavorite safely.
-    // FIX 1: Change user.FavoriteMovies to user.favoriteMovies (lowercase 'f')
+    
     const [isFavorite, setIsFavorite] = useState(
         user && user.favoriteMovies && Array.isArray(user.favoriteMovies) &&
         user.favoriteMovies.includes(movie._id.$oid || movie._id)
@@ -14,7 +15,7 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
 
     // Update isFavorite whenever the 'user' prop or 'movie._id' changes
     useEffect(() => {
-        // FIX 2: Change user.FavoriteMovies to user.favoriteMovies (lowercase 'f')
+        
         if (user && user.favoriteMovies && Array.isArray(user.favoriteMovies)) {
             setIsFavorite(user.favoriteMovies.includes(movie._id.$oid || movie._id));
         } else {
@@ -31,8 +32,8 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
         }
 
         const method = isFavorite ? 'DELETE' : 'POST';
-        // FIX 3: Change user.Username to user.username (lowercase 'u')
-        const url = `https://oscars2025-f0070acec0c4.herokuapp.com/users/${user.username}/movies/${movie._id.$oid || movie._id}`; // FIX: Changed `favorites` to `movies` in URL
+
+        const url = `${API_BASE_URL}/users/${user.username}/movies/${movie._id.$oid || movie._id}`;
 
         fetch(url, {
             method: method,
@@ -60,7 +61,12 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
 
     return (
         <Card className="h-100">
-            <Card.Img variant="top" src={movie.imageURL} alt={movie.title} style={{ objectFit: 'cover', height: '200px' }} />
+            <Card.Img
+                variant="top"
+                src={`${API_BASE_URL}/images/${movie.imageURL}`} // Construct the full URL for the image
+                alt={movie.title}
+                style={{ objectFit: 'cover', height: '200px' }}
+            />
             <Card.Body>
                 <Card.Title>{movie.title}</Card.Title>
                 <Card.Text>
