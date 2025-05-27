@@ -99,7 +99,7 @@ export const MovieView = ({ user, token, onUserUpdate }) => {
             <Row className="g-0">
                 <Col md={4}>
                     <Card.Img
-                        src={`${API_BASE_URL}/images/${movie.imageURL}`} // Construct the full URL for the image
+                        src={`${API_BASE_URL}/${movie.imageURL}`} // Construct the full URL for the image
                         alt={movie.title}
                         style={{ objectFit: 'cover', height: '300px' }}
                     />

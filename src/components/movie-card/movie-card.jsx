@@ -63,7 +63,7 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
         <Card className="h-100">
             <Card.Img
                 variant="top"
-                src={`${API_BASE_URL}/images/${movie.imageURL}`} // Construct the full URL for the image
+                src={`${API_BASE_URL}/${movie.imageURL}`} // Construct the full URL for the image
                 alt={movie.title}
                 style={{ objectFit: 'cover', height: '200px' }}
             />

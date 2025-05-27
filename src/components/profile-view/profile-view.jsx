@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types'; // Import PropTypes
+import PropTypes from 'prop-types'; 
 import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
 import { MovieCard } from '../movie-card/movie-card';
 import { useNavigate } from 'react-router-dom';
@@ -58,7 +58,7 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
 
     // Effect to filter favorite movies (depends on profileUser and allMovies state)
     useEffect(() => {
-        // FIX 3: Change profileUser.FavoriteMovies to profileUser.favoriteMovies (lowercase 'f')
+       
         if (profileUser && allMovies.length > 0 && profileUser.favoriteMovies) {
             const favMovies = allMovies.filter(movie =>
                 profileUser.favoriteMovies.includes(movie._id?.$oid || movie._id)
@@ -77,7 +77,6 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
     const handleCancelEdit = () => {
         setIsEditing(false);
         // Reset form fields to current profileUser state values
-        // FIX 4: Change profileUser.Username to profileUser.username (and for Email, Birthday)
         setUsername(profileUser.username);
         setEmail(profileUser.email);
         setBirthday(profileUser.birthday ? new Date(profileUser.birthday).toISOString().split('T')[0] : '');
@@ -155,7 +154,6 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
         if (!token || !profileUser) return;
 
         if (window.confirm('Are you sure you want to deregister your account? This action cannot be undone.')) {
-            // FIX 7: Change profileUser.Username in URL to profileUser.username
             fetch(`https://oscars2025-f0070acec0c4.herokuapp.com/users/${profileUser.username}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` },
@@ -233,7 +231,7 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
                                             type="date"
                                             value={birthday}
                                             onChange={(e) => setBirthday(e.target.value)}
-                                            // required // Birthday might not be strictly required by your API
+                                            // required // Birthday might not be strictly required.
                                         />
                                     </Form.Group>
 
@@ -242,7 +240,6 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
                                 </Form>
                             ) : (
                                 <>
-                                    {/* FIX 8: Change profileUser.Username to profileUser.username (and for Email, Birthday) */}
                                     <Card.Text><strong>Username:</strong> {profileUser.username}</Card.Text>
                                     <Card.Text><strong>Email:</strong> {profileUser.email}</Card.Text>
                                     <Card.Text><strong>Birthday:</strong> {profileUser.birthday ?

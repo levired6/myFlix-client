@@ -7,17 +7,17 @@ export const SignupView = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
-    const [birthday, setBirthday] = useState(""); // FIX: Renamed 'birthdate' state to 'birthday' for consistency with backend model
+    const [birthday, setBirthday] = useState(""); 
     const navigate = useNavigate();
 
     const handleSubmit = (event) => {
         event.preventDefault();
 
         const userData = {
-            username: username, // FIX: Changed to lowercase 'username'
-            password: password, // FIX: Changed to lowercase 'password'
-            email: email,       // FIX: Changed to lowercase 'email'
-            birthday: birthday, // FIX: Changed to lowercase 'birthday'
+            username: username,
+            password: password, 
+            email: email,      
+            birthday: birthday, 
         };
 
         fetch('https://oscars2025-f0070acec0c4.herokuapp.com/users', {
@@ -87,8 +87,8 @@ export const SignupView = () => {
                 <Form.Label>Birthday:</Form.Label>
                 <Form.Control
                     type="date"
-                    value={birthday} // FIX: Using 'birthday' state
-                    onChange={(e) => setBirthday(e.target.value)} // FIX: Set 'birthday' state
+                    value={birthday} 
+                    onChange={(e) => setBirthday(e.target.value)} 
                     required
                     className="bg-white text-dark"
                 />

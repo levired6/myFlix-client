@@ -1,11 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Remove useNavigate if not directly used for navigation within Navbar
+import { Link } from 'react-router-dom'; 
 import { Navbar, Nav, Button } from 'react-bootstrap';
 
 // Receive onLogout and user props
 export const NavigationBar = ({ onLogout, user }) => { 
-    // Use the user prop directly; MyFlixApplication is responsible for its accuracy
-    // If user is null, it means no one is logged in.
     const loggedInUser = user; 
 
     return (

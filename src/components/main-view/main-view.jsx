@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { MovieCard } from "../movie-card/movie-card";
-import { Link, useNavigate } from "react-router-dom"; // Link is not used here, can remove
+import { Link, useNavigate } from "react-router-dom"; 
 import { Row, Col, Container } from "react-bootstrap";
 import PropTypes from 'prop-types'; // Import PropTypes
 
@@ -10,14 +10,14 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!token) { // Use the prop 'token'
+        if (!token) { 
             console.log("MainView: Token not found, redirecting to login.");
             navigate('/login');
             return;
         }
 
         fetch("https://oscars2025-f0070acec0c4.herokuapp.com/movies", {
-            headers: { Authorization: `Bearer ${token}` }, // Use the prop 'token'
+            headers: { Authorization: `Bearer ${token}` }, 
         })
             .then((response) => {
                 if (!response.ok) {
@@ -61,7 +61,7 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
                                 movie={movie}
                                 user={user}
                                 token={token}
-                                onUserUpdate={onUserUpdate} // Pass onUserUpdate prop
+                                onUserUpdate={onUserUpdate} 
                             />
                         </Col>
                     );
