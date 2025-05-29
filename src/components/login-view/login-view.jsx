@@ -1,40 +1,46 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate in LoginView
 
 export const LoginView = ({ onLoggedIn }) =>{
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate(); // Get navigate in LoginView
 
   const handleSubmit = (event) => {
     //this prevents the default behavior of the form which is to reload the entire page
     event.preventDefault();
 
-    const data = {
-      Username: username,
-      Password: password,
-    };
+const data = {
+  username: username, 
+  password: password, 
+};
 
     fetch('https://oscars2025-f0070acec0c4.herokuapp.com/login', {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(data),
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Login response: ", data);
-        if (data.token) {
-          localStorage.setItem("token", data.token);  
+        console.log("Login response:", data);
+        if (data.user && data.token) {
+          // Store token and user in localStorage here, so MyFlixApplication can pick them up
+          localStorage.setItem("token", data.token);
           localStorage.setItem("user", JSON.stringify(data.user));
-          onLoggedIn(data.user, data.token);
+          
+          onLoggedIn(data.user, data.token); // Call onLoggedIn to update state in MyFlixApplication
+          
+          navigate('/'); // Navigate after successful login
         } else {
-          alert("Invalid username or password.");
+          alert("No such user or incorrect password!");
         }
       })
       .catch((e) => {
-        console.error('Login error:', error);
-        alert("Something went wrong during login.");
+        console.error('Login error:', e);
+        alert(`Something went wrong during login: ${e.message}`);
       });
   };
 
