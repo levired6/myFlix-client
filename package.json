@@ -1,0 +1,33 @@
+{
+  "name": "myflix-client",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/levired6/myFlix-client#readme",
+  "bugs": {
+    "url": "https://github.com/levired6/myFlix-client/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/levired6/myFlix-client.git"
+  },
+  "license": "ISC",
+  "author": "levired6",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "parcel build index.jsx --dist-dir build --public-url ./",
+    "start": "parcel src/index.html"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.6",
+    "prop-types": "^15.8.1",
+    "react": "^19.1.0",
+    "react-bootstrap": "^2.10.9",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^6.3.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "2.14.4",
+    "parcel": "^2.14.4"
+  }
+}

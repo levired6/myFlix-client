@@ -1,0 +1,61 @@
+$primary: #4682B4;
+$body-bg: #222;
+$body-color: #fff;
+
+@import '~bootstrap/scss/bootstrap.scss';
+
+// Custom styles for the login/signup container
+.bg-dark {
+  background-color: #1a1a1a !important; /* A slightly lighter black for the container */
+  background-image: linear-gradient(to bottom, #292929, #0d0d0d);
+  box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.metallic-blue-button {
+  background-color: $primary; /* Use the $primary blue variable */
+  border-color: $primary;
+  color: white;
+  background-image: linear-gradient(to bottom, lighten($primary, 10%), darken($primary, 10%));
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  /* Add a subtle shine effect */
+  background-image: linear-gradient(to bottom, #63a4ff, #326ea1); /* More vibrant blue range */
+  /* Slightly adjust the box shadow for better definition */
+  box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.4);
+  /* Add a subtle border */
+  border: 1px solid darken($primary, 15%);
+  font-weight: bold; /* Make the text stand out */
+  padding: 8px 16px; /* Adjust padding */
+
+  &:hover {
+    background-color: darken($primary, 10%);
+    border-color: darken($primary, 15%);
+    box-shadow: 0px 3px 9px rgba(0, 0, 0, 0.5);
+  }
+  &:active {
+    background-color: darken($primary, 20%) !important;
+    border-color: darken($primary, 25%) !important;
+    box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.5) !important;
+  }
+}
+
+// Ensure text in white fields remains dark (if you're still using white backgrounds for inputs)
+.bg-white {
+  --bs-bg-opacity: 1;
+  background-color: rgba(var(--bs-white-rgb), var(--bs-bg-opacity)) !important;
+}
+
+.text-dark {
+  --bs-text-opacity: 1;
+  color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
+}
+
+// Style for the link buttons (Sign up/Log in)
+.btn-link {
+  color: lightblue; /* Or any color that stands out */
+  &:hover {
+    color: white;
+    text-decoration: underline;
+  }
+}
+

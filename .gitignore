@@ -1,0 +1,17 @@
+# Node.js dependencies
+/node_modules
+
+# Build artifacts and caches
+/dist
+.parcel-cache/
+.cache/
+
+# Environment variables
+.env
+.env.*local # Catches .env.local, .env.development.local, etc.
+
+# Operating System files
+.DS_Store
+
+# Logs
+*.log
