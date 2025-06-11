@@ -3,6 +3,7 @@
 
 # Build artifacts and caches
 /dist
+/build
 .parcel-cache/
 .cache/
 
