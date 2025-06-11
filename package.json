@@ -15,7 +15,7 @@
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "parcel build index.jsx --dist-dir build --public-url ./",
+    "build": "parcel build index.html --dist-dir build --public-url ./",
     "start": "parcel src/index.html"
   },
   "dependencies": {
@@ -28,6 +28,8 @@
   },
   "devDependencies": {
     "@parcel/transformer-sass": "2.14.4",
-    "parcel": "^2.14.4"
+    "parcel": "^2.14.4",
+    "buffer": "^6.0.3",
+    "process": "^0.11.10"
   }
 }
