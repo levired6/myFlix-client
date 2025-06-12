@@ -10,3 +10,4 @@
 [context.production.environment]
   NODE_VERSION = "22"
   PARCEL_CPU_COUNT = "1"
+  NPM_FLAGS = "--prefer-ci"
