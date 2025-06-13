@@ -4,10 +4,10 @@
   status = 200
 
   [build]
-  command = "npm run build"
+  command = "npx parcel@2.9.3 build src/index.html --dist-dir build --public-url ./"
   publish = "build"
 
 [context.production.environment]
   NODE_VERSION = "22"
   PARCEL_CPU_COUNT = "1"
-  NPM_FLAGS = "--prefer-ci"
+  
