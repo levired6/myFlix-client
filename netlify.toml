@@ -8,6 +8,6 @@
   publish = "build"
 
 [context.production.environment]
-  NODE_VERSION = "22"
+  NODE_VERSION = "18"
   PARCEL_CPU_COUNT = "1"
   
