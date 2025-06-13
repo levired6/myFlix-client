@@ -4,7 +4,7 @@
   status = 200
 
   [build]
-  command = "npx parcel@2.9.3 build src/index.html --dist-dir build --public-url ./"
+  command = "npx parcel build src/index.html --dist-dir build --public-url ./"
   publish = "build"
 
 [context.production.environment]
