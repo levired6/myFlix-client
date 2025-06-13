@@ -15,7 +15,7 @@
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "parcel build src/index.html --dist-dir build --public-url ./",
+    "build": "npx parcel@2.9.3 build src/index.html --dist-dir build --public-url ./",
     "start": "parcel src/index.html"
   },
   "dependencies": {
@@ -27,8 +27,8 @@
     "react-router-dom": "^6.3.0"
   },
   "devDependencies": {
-    "@parcel/transformer-sass": "^2.9.3",
-    "parcel": "^2.9.3",
+    "@parcel/transformer-sass": "2.9.3",
+    "parcel": "2.9.3",
     "buffer": "^6.0.3",
     "process": "^0.11.10"
   }
