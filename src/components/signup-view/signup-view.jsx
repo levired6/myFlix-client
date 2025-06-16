@@ -1,6 +1,5 @@
 import { useState } from "react";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
+import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 
 export const SignupView = () => {
@@ -48,55 +47,78 @@ export const SignupView = () => {
     };
 
     return (
-        <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="signUpFormUsername">
-                <Form.Label>Username:</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                    minLength="3"
-                    className="bg-white text-dark"
-                />
-            </Form.Group>
+        <Container className="mt-5">
+            <Row className="justify-content-center">
+                <Col xs={12} sm={8} md={6} lg={4}> {/* Responsive column sizing */}
+                    <h2 className="text-center mb-4">Signup</h2> {/* Centered title */}
+                    <Form onSubmit={handleSubmit} className="text-center"> 
+                        <Form.Group className="mb-3" controlId="signUpFormUsername">
+                            <Form.Label>Username:</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                                minLength="5" // Added minlength validation
+                                className="bg-white text-dark mx-auto"
+                                style={{ maxWidth: '300px' }}
+                            />
+                            <Form.Text className="text-muted">
+                                Must be 5 or more characters.
+                            </Form.Text>
+                        </Form.Group>
 
-            <Form.Group className="mb-3" controlId="signUpFormPassword">
-                <Form.Label>Password:</Form.Label>
-                <Form.Control
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-white text-dark"
-                />
-            </Form.Group>
+                        <Form.Group className="mb-3" controlId="signUpFormPassword">
+                            <Form.Label>Password:</Form.Label>
+                            <Form.Control
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                className="bg-white text-dark mx-auto"
+                                style={{ maxWidth: '300px' }}
+                            />
+                            <Form.Text className="text-muted">
+                                Must be 5 or more characters, including uppercase, lowercase, numbers, and special characters (!@#$%^&*-=_+).
+                            </Form.Text>
+                        </Form.Group>
 
-            <Form.Group className="mb-3" controlId="signUpFormEmail">
-                <Form.Label>Email:</Form.Label>
-                <Form.Control
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="bg-white text-dark"
-                />
-            </Form.Group>
+                        <Form.Group className="mb-3" controlId="signUpFormEmail">
+                            <Form.Label>Email:</Form.Label>
+                            <Form.Control
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="bg-white text-dark mx-auto"
+                                style={{ maxWidth: '300px' }}
+                            />
+                            <Form.Text className="text-muted">
+                                Enter a valid email address.
+                            </Form.Text>
+                        </Form.Group>
 
-            <Form.Group className="mb-3" controlId="signUpFormBirthday">
-                <Form.Label>Birthday:</Form.Label>
-                <Form.Control
-                    type="date"
-                    value={birthday} 
-                    onChange={(e) => setBirthday(e.target.value)} 
-                    required
-                    className="bg-white text-dark"
-                />
-            </Form.Group>
+                        <Form.Group className="mb-3" controlId="signUpFormBirthday">
+                            <Form.Label>Birthday:</Form.Label>
+                            <Form.Control
+                                type="date"
+                                value={birthday}
+                                onChange={(e) => setBirthday(e.target.value)}
+                                required
+                                className="bg-white text-dark mx-auto"
+                                style={{ maxWidth: '300px' }}
+                            />
+                            <Form.Text className="text-muted">
+                                Optional: Your date of birth (MM/DD/YYYY).
+                            </Form.Text>
+                        </Form.Group>
 
-            <Button variant="primary" type="submit" className="metallic-blue-button">
-                Submit
-            </Button>
-        </Form>
+                        <Button variant="primary" type="submit" className="metallic-blue-button mt-3">
+                            Submit
+                        </Button>
+                    </Form>
+                </Col>
+            </Row>
+        </Container>
     );
 };

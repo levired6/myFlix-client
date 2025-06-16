@@ -8,7 +8,7 @@ export const NavigationBar = ({ onLogout, user }) => {
 
     return (
         <Navbar bg="dark" variant="dark" expand="lg">
-            <Navbar.Brand as={Link} to="/">myFlix</Navbar.Brand>
+            <Navbar.Brand as={Link} to="/" className="ms-3">myFlix</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto">
@@ -16,7 +16,7 @@ export const NavigationBar = ({ onLogout, user }) => {
                         <>
                             <Nav.Link as={Link} to="/">Home</Nav.Link>
                             <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
-                            <Button variant="outline-info" onClick={onLogout}>Logout</Button>
+                            <Button variant="outline-info" onClick={onLogout}  className="ms-auto">Logout</Button>
                         </>
                     ) : (
                         <>

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { MovieCard } from "../movie-card/movie-card";
 import { Link, useNavigate } from "react-router-dom"; 
-import { Row, Col, Container } from "react-bootstrap";
+import { Row, Col, Container, Form, Navbar, Nav, Button } from "react-bootstrap";
 import PropTypes from 'prop-types'; // Import PropTypes
 
 // Accept user, token, onUserUpdate, and onLoggedOut as props
 export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
     const [movies, setMovies] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -15,7 +16,7 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
             navigate('/login');
             return;
         }
-
+        //Fetch movies only if token exists
         fetch("https://oscars2025-f0070acec0c4.herokuapp.com/movies", {
             headers: { Authorization: `Bearer ${token}` }, 
         })
@@ -38,6 +39,24 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
             });
     }, [token, navigate, onLoggedOut]); // Depend on token prop, navigate, and onLoggedOut
 
+    // Filter movies based on search term
+    const filteredMovies = movies.filter((movie) => {
+        // Convert search term to lowercase for case-insensitive comparison
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+        // Check if title includes search term
+        const matchesTitle = movie.title.toLowerCase().includes(lowerCaseSearchTerm);
+
+        // Check if genre name includes search term (if genre exists)
+        const matchesGenre = movie.genre && movie.genre.name.toLowerCase().includes(lowerCaseSearchTerm);
+
+        // Check if director name includes search term (if director exists)
+        const matchesDirector = movie.director && movie.director.name.toLowerCase().includes(lowerCaseSearchTerm);
+
+        // Return true if any of the conditions are met
+        return matchesTitle || matchesGenre || matchesDirector;
+    });
+
     if (movies.length === 0) {
         return (
             <Container className="mt-5">
@@ -52,21 +71,42 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
 
     return (
         <Container className="mt-4">
-            <Row xs={1} md={3} lg={4} className="g-4">
-                {movies.map((movie, index) => {
-                    const keyProp = movie._id?.$oid || movie._id || index.toString();
-                    return (
-                        <Col key={keyProp}>
-                            <MovieCard
-                                movie={movie}
-                                user={user}
-                                token={token}
-                                onUserUpdate={onUserUpdate} 
-                            />
-                        </Col>
-                    );
-                })}
+            {/* Search Input Field */}
+            <Row className="mb-4 justify-content-center"> {/* Added justify-content-center for horizontal centering */}
+                <Col xs={12} md={8} lg={6}> {/* Adjusted column size for better responsiveness */}
+                    <Form.Control
+                        type="text"
+                        placeholder="Search by title, genre, or director..."
+                        className="search-input bg-white text-dark rounded-pill shadow-sm" // Added custom class for styling
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </Col>
             </Row>
+
+            {filteredMovies.length === 0 && searchTerm !== "" ? (
+                <Row className="justify-content-center mt-5">
+                    <Col xs={12} className="text-center text-white">
+                        No movies found matching your search.
+                    </Col>
+                </Row>
+            ) : (
+                <Row xs={1} md={3} lg={4} className="g-4">
+                    {filteredMovies.map((movie, index) => {
+                        const keyProp = movie._id?.$oid || movie._id || index.toString();
+                        return (
+                            <Col key={keyProp}>
+                                <MovieCard
+                                    movie={movie}
+                                    user={user}
+                                    token={token}
+                                    onUserUpdate={onUserUpdate}
+                                />
+                            </Col>
+                        );
+                    })}
+                </Row>
+            )}
         </Container>
     );
 };
