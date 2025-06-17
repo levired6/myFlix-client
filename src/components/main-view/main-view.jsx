@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { MovieCard } from "../movie-card/movie-card";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import { Row, Col, Container, Form, Navbar, Nav, Button } from "react-bootstrap";
-import PropTypes from 'prop-types'; // Import PropTypes
+import PropTypes from 'prop-types';
 
-// Accept user, token, onUserUpdate, and onLoggedOut as props
 export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
     const [movies, setMovies] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState(""); // New state for search term
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!token) { 
+        if (!token) {
             console.log("MainView: Token not found, redirecting to login.");
             navigate('/login');
             return;
         }
-        //Fetch movies only if token exists
+
+        // Fetch movies only if token exists
         fetch("https://oscars2025-f0070acec0c4.herokuapp.com/movies", {
-            headers: { Authorization: `Bearer ${token}` }, 
+            headers: { Authorization: `Bearer ${token}` },
         })
             .then((response) => {
                 if (!response.ok) {
-                    if (response.status === 401) { // Handle unauthorized specifically
+                    if (response.status === 401) {
                         console.error("Unauthorized: Token expired or invalid during movie fetch in MainView.");
-                        onLoggedOut(); // Use the prop to log out
+                        onLoggedOut();
                         return;
                     }
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -37,7 +37,7 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
             .catch((error) => {
                 console.error("Error fetching movies in MainView:", error);
             });
-    }, [token, navigate, onLoggedOut]); // Depend on token prop, navigate, and onLoggedOut
+    }, [token, navigate, onLoggedOut]);
 
     // Filter movies based on search term
     const filteredMovies = movies.filter((movie) => {
@@ -71,10 +71,22 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
 
     return (
         <Container className="mt-4">
-            {/* Search Input Field with label and helper text*/}
-            <Row className="mb-4 justify-content-center"> {/* Added justify-content-center for horizontal centering */}
-                <Col xs={12} md={8} lg={6}> {/* Adjusted column size for better responsiveness */}
-                     <Form.Group controlId="movieSearch">
+            {/* Welcome Graphic Section */}
+            <Row className="mb-5 justify-content-center">
+                <Col xs={12} className="text-center">
+                    <div className="welcome-graphic p-4 rounded-3 shadow-lg">
+                        <h1 className="welcome-title fw-bold mb-2">Welcome to myFlix 2025 Oscar nomination review!</h1>
+                        <p className="welcome-text text-white-75">
+                            Explore and review the top nominated films. Use the search bar below to find movies by title, genre, or director.
+                        </p>
+                    </div>
+                </Col>
+            </Row>
+
+            {/* Search Input Field with Label and Helper Text */}
+            <Row className="mb-4 justify-content-center">
+                <Col xs={12} md={8} lg={6}>
+                    <Form.Group controlId="movieSearch">
                         <Form.Label className="text-white">Search:</Form.Label>
                         <Form.Control
                             type="text"
