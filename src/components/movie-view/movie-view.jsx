@@ -94,14 +94,16 @@ export const MovieView = ({ user, token, onUserUpdate }) => {
         return <p>Loading movie details...</p>;
     }
 
-    return (
+     return (
         <Card className="mt-4">
             <Row className="g-0">
                 <Col md={4}>
                     <Card.Img
                         src={`${API_BASE_URL}/${movie.imageURL}`} // Construct the full URL for the image
                         alt={movie.title}
-                        style={{ objectFit: 'cover', height: '300px' }}
+                        // Updated style for image fitting: `objectFit: 'contain'`
+                        // `width: '100%', height: 'auto'` makes it responsive within the column.
+                        style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
                     />
                 </Col>
                 <Col md={8}>

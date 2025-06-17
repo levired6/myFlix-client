@@ -65,7 +65,8 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
                 variant="top"
                 src={`${API_BASE_URL}/${movie.imageURL}`} // Construct the full URL for the image
                 alt={movie.title}
-                style={{ objectFit: 'cover', height: '200px' }}
+                //style={{ objectFit: 'cover', height: '200px' }}
+                style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
             />
             <Card.Body>
                 <Card.Title>{movie.title}</Card.Title>
@@ -76,8 +77,9 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
                     {/* Link to movie details - no casing issues here as _id is from API response */}
                     <Link to={`/movies/${movie._id.$oid || movie._id}`} className="btn btn-primary">Learn more</Link>
                     {user && token ? (
-                        <Button
-                            variant={isFavorite ? 'danger' : 'outline-danger'}
+                         <Button
+                            // Use custom class for styling the favorite button
+                            className={`favorite-toggle-button ${isFavorite ? 'is-favorite' : ''}`}
                             onClick={handleFavoriteClick}
                             size="sm"
                         >

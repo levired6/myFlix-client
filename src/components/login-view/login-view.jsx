@@ -1,11 +1,17 @@
 import React, { useState } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, InputGroup } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate in LoginView
 
 export const LoginView = ({ onLoggedIn }) =>{
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordShown, setPasswordShown] = useState(false); // New state for password visibility
   const navigate = useNavigate(); // Get navigate in LoginView
+
+// Function to toggle password visibility
+    const togglePasswordVisibility = () => {
+        setPasswordShown(!passwordShown);
+    };
 
   const handleSubmit = (event) => {
     //this prevents the default behavior of the form which is to reload the entire page
@@ -69,15 +75,25 @@ const data = {
 
                         <Form.Group className="mb-3" controlId="formPassword">
                             <Form.Label>Password:</Form.Label>
-                            <Form.Control
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="bg-white text-dark mx-auto" // mx-auto for horizontal centering of control
-                                style={{ maxWidth: '300px' }} // Optional: limit width for tighter look
-                            />
-                            {/* Helper text below input */}
+                           {/* InputGroup for password visibility toggle */}
+                            <InputGroup className="mx-auto" style={{ maxWidth: '300px' }}>
+                                <Form.Control
+                                    type={passwordShown ? "text" : "password"} // Toggle type
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    className="bg-white text-dark" // Removed mx-auto here as InputGroup handles centering
+                                />
+                                <Button
+                                    variant="outline-secondary"
+                                    onClick={togglePasswordVisibility}
+                                    className="text-white" // Keep button icon/text visible on dark background
+                                >
+                                    {/* Font Awesome Eye Icon - ensure Font Awesome is linked in index.html */}
+                                    <i className={passwordShown ? "fa-solid fa-eye-slash" : "fa-solid fa-eye"}></i>
+                                    {/* Or use a simple text toggle if Font Awesome is not preferred: {passwordShown ? "Hide" : "Show"} */}
+                                </Button>
+                            </InputGroup>
                             <Form.Text className="text-muted">
                                 Enter your password.
                             </Form.Text>

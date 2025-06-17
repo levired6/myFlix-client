@@ -71,16 +71,22 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
 
     return (
         <Container className="mt-4">
-            {/* Search Input Field */}
+            {/* Search Input Field with label and helper text*/}
             <Row className="mb-4 justify-content-center"> {/* Added justify-content-center for horizontal centering */}
                 <Col xs={12} md={8} lg={6}> {/* Adjusted column size for better responsiveness */}
-                    <Form.Control
-                        type="text"
-                        placeholder="Search by title, genre, or director..."
-                        className="search-input bg-white text-dark rounded-pill shadow-sm" // Added custom class for styling
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                     <Form.Group controlId="movieSearch">
+                        <Form.Label className="text-white">Search:</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Search by title, genre, or director..."
+                            className="search-input bg-white text-dark rounded-pill shadow-sm"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <Form.Text className="text-muted">
+                            You can look up movies by title, genre, or director name.
+                        </Form.Text>
+                    </Form.Group>
                 </Col>
             </Row>
 
@@ -112,8 +118,8 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
 };
 
 MainView.propTypes = {
-    token: PropTypes.string, // Can be null initially if not logged in
-    user: PropTypes.object, // Can be null initially if not logged in
-    onUserUpdate: PropTypes.func.isRequired, // Now required as it's passed down
-    onLoggedOut: PropTypes.func.isRequired, // Now required as it handles auth issues
+    token: PropTypes.string,
+    user: PropTypes.object,
+    onUserUpdate: PropTypes.func.isRequired,
+    onLoggedOut: PropTypes.func.isRequired,
 };

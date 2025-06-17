@@ -59,3 +59,38 @@ $body-color: #fff;
   }
 }
 
+/* Custom styles for the Favorite/Remove Favorite button in MovieCard */
+.favorite-toggle-button {
+    // Default state: White text with red outline
+    &.btn { // Ensures these styles apply to Bootstrap buttons
+        color: white;
+        border-color: #dc3545; // Bootstrap's 'danger' red
+        background-color: transparent; // Ensure transparent background
+        
+        // Hover state: Solid red background with white text
+        &:hover {
+            color: white;
+            background-color: #dc3545; // Bootstrap's 'danger' red
+            border-color: #dc3545; // Ensure border is also red
+        }
+
+        // Active state for click
+        &:active {
+            background-color: darken(#dc3545, 10%) !important;
+            border-color: darken(#dc3545, 10%) !important;
+            color: white !important;
+        }
+    }
+
+    // When the movie is a favorite (meaning it's the "Remove" button)
+    &.is-favorite {
+        background-color: #dc3545; // Solid red
+        border-color: #dc3545;
+        color: white;
+
+        &:hover {
+            background-color: darken(#dc3545, 10%); // Slightly darker red on hover
+            border-color: darken(#dc3545, 10%);
+        }
+    }
+}
