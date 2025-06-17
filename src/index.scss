@@ -102,8 +102,8 @@ $body-color: #fff;
     color: white; // Default text color
     overflow: hidden; // Hide overflow if image is too big
 
-    // Placeholder for Oscar award image. REPLACE THIS URL with your actual image URL.
-    background-image: url('https://placehold.co/1000x300/1a1a1a/FFF?text=Oscar+Award+Placeholder'); 
+    // CORRECTED: Oscar award image path now points to src/images/oscar-award.png
+    background-image: url('/images/oscar-award.png'); 
     background-size: cover; // Cover the area
     background-position: center; // Center the image
     background-repeat: no-repeat; // Don't repeat the image
@@ -116,7 +116,8 @@ $body-color: #fff;
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url('/images/oscar-award.png'); // Duplicate for pseudo-element
+        // CORRECTED: Duplicate for pseudo-element, use the same path
+        background-image: url('/images/oscar-award.png'); 
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
