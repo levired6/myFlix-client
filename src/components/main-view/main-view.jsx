@@ -76,9 +76,9 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
                 <Col xs={12} className="text-center">
                     <div className="welcome-graphic p-4 rounded-3 shadow-lg">
                         <h1 className="welcome-title fw-bold mb-2">Welcome to myFlix 2025 Oscar nomination review!</h1>
-                        {/* Updated helper text below welcome title */}
+                        {/* Updated helper text below welcome title as confirmed */}
                         <p className="welcome-text text-white-75">
-                            Explore and add movies to make a list of your favorites. Write and post your very own review for other users to read.
+                            Explore and add movies to create your own list of favorites. Write your personal review for each, detailing why you liked or disliked it.
                         </p>
                     </div>
                 </Col>
