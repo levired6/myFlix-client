@@ -76,8 +76,9 @@ export const MainView = ({ token, user, onUserUpdate, onLoggedOut }) => {
                 <Col xs={12} className="text-center">
                     <div className="welcome-graphic p-4 rounded-3 shadow-lg">
                         <h1 className="welcome-title fw-bold mb-2">Welcome to myFlix 2025 Oscar nomination review!</h1>
+                        {/* Updated helper text below welcome title */}
                         <p className="welcome-text text-white-75">
-                            Explore and review the top nominated films. Use the search bar below to find movies by title, genre, or director.
+                            Explore and add movies to make a list of your favorites. Write and post your very own review for other users to read.
                         </p>
                     </div>
                 </Col>

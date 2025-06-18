@@ -101,31 +101,17 @@ $body-color: #fff;
     background-color: #1a1a1a; // Dark background
     color: white; // Default text color
     overflow: hidden; // Hide overflow if image is too big
+    padding: 2.5rem 1rem; // Adjusted padding for better spacing
 
-    // Oscar award image path now points to src/images/oscar-award.png
-    background-image: url('images/oscar-award.png'); 
+    // NEW: Oscar banner image path
+    background-image: url('images/osc-banner_statuette.jpg');
     background-size: cover; // Cover the area
-    background-position: center; // Center the image
-    background-repeat: no-repeat; // Don't repeat the image
+    background-position: center top; // Center horizontally, align to top vertically
+    background-repeat: no-repeat;
     
-    // Faded effect for the background image by making it a pseudo-element
-    &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        // CORRECTED: Duplicate for pseudo-element, use the same path
-        background-image: url('images/oscar-award.png'); 
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        opacity: 0.1; // Adjust this value for more or less fade
-        z-index: 0; // Ensure it's behind the text
-    }
+    // REMOVED: The `::before` pseudo-element for faded effect is removed as per request.
 
-    // Gradient overlay for metallic gold text effect and ensuring readability
+    // Adjusted: Gradient overlay for metallic gold text effect and ensuring readability
     &::after {
         content: "";
         position: absolute;
@@ -133,8 +119,8 @@ $body-color: #fff;
         left: 0;
         width: 100%;
         height: 100%;
-        // Subtle dark gradient to make text stand out over faded image
-        background: linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.2), rgba(0,0,0,0.4));
+        // More subtle gradient, adjusted for better text contrast over the new image
+        background: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.2), rgba(0,0,0,0.6));
         z-index: 1; // Ensure it's between background and text
     }
 
@@ -144,21 +130,30 @@ $body-color: #fff;
     }
 
     .welcome-title {
-        // Metallic gold text effect
+        // Metallic gold text effect - adjusted for better clarity
         color: #DAA520; // A base gold color
         background: linear-gradient(to right, #FFD700, #DAA520, #B8860B, #FFD700);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        font-size: 2.5rem; // Adjust size as needed
-        text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5); // Subtle shadow for depth
-        margin-bottom: 0.5rem; // Space below title
+        // text-fill-color: transparent; // Removed this problematic line (already done)
+        font-size: 2.75rem; // Slightly larger for better readability
+        text-shadow: 0px 3px 5px rgba(0, 0, 0, 0.7); // Stronger shadow for depth and readability
+        margin-bottom: 0.75rem; // Slightly more space below title
+
+        @media (max-width: 768px) {
+            font-size: 1.8rem; // Adjust for smaller screens
+        }
     }
 
     .welcome-text {
-        font-size: 1.1rem;
-        // Ensuring visibility over the background image and gold title
-        color: rgba(255, 255, 255, 0.9);
-        font-weight: 300;
+        font-size: 1.2rem; // Slightly larger for readability
+        color: rgba(255, 255, 255, 0.95); // Slightly less transparent for better visibility
+        font-weight: 400; // Slightly bolder
+        text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.6); // Subtle shadow for readability
+
+        @media (max-width: 768px) {
+            font-size: 1rem; // Adjust for smaller screens
+        }
     }
 }
