@@ -4,19 +4,23 @@ import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
 import { MovieCard } from '../movie-card/movie-card';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE_URL = 'https://oscars2025-f0070acec0c4.herokuapp.com';
+
 // Accept user, token, onUserUpdate, and onLoggedOut as props
 export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
     // Renamed local state to profileUser to avoid confusion with the prop 'user'
     const [profileUser, setProfileUser] = useState(user);
     const [allMovies, setAllMovies] = useState([]); // Fetched all movies within ProfileView
-    const [favoriteMovies, setFavoriteMovies] = useState([]);
+    // favoriteMovies will now store objects that combine movie data and the user's comment
+    const [favoriteMovies, setFavoriteMovies] = useState([]); 
     const [isEditing, setIsEditing] = useState(false);
 
     // Initialize form fields directly from the 'user' prop
     const [username, setUsername] = useState(user?.username || '');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState(user?.email || '');
-    const [birthday, setBirthday] = useState(user?.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
+    // Convert birthday to YYYY-MM-DD format for date input
+    const [birthday, setBirthday] = useState(user?.birthday ? new Date(user.birthday).toISOString().split('T')[0] : ''); 
     const navigate = useNavigate();
 
     // Effect to set initial form values and *re-sync* if 'user' prop changes
@@ -36,7 +40,7 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
             navigate('/login'); // Redirect if no token
             return;
         }
-        fetch('https://oscars2025-f0070acec0c4.herokuapp.com/movies', {
+        fetch(`${API_BASE_URL}/movies`, { // Use API_BASE_URL variable
             headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -56,18 +60,30 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
         .catch((error) => console.error('Error fetching all movies in ProfileView:', error));
     }, [token, navigate, onLoggedOut]); // Added onLoggedOut to dependency array
 
-    // Effect to filter favorite movies (depends on profileUser and allMovies state)
+    // Effect to filter favorite movies and attach comments (depends on profileUser and allMovies state)
+    // IMPORTANT: This now maps over profileUser.favoriteMovies (which includes comments)
+    // and finds the full movie object from allMovies, then combines them.
     useEffect(() => {
-       
         if (profileUser && allMovies.length > 0 && profileUser.favoriteMovies) {
-            const favMovies = allMovies.filter(movie =>
-                profileUser.favoriteMovies.includes(movie._id?.$oid || movie._id)
-            );
-            setFavoriteMovies(favMovies);
+            const favMoviesWithComments = profileUser.favoriteMovies
+                .map(favEntry => {
+                    const movieId = favEntry.movieId?.$oid || favEntry.movieId; // Handle both direct ID and $oid
+                    const movieData = allMovies.find(movie => 
+                        (movie._id?.$oid || movie._id) === movieId
+                    );
+                    if (movieData) {
+                        // Return a new object that combines movie data with the user's comment
+                        return { ...movieData, userComment: favEntry.comment };
+                    }
+                    return null; // Handle case where movie data isn't found in allMovies (e.g., deleted movie)
+                })
+                .filter(Boolean); // Remove any null entries from the map
+
+            setFavoriteMovies(favMoviesWithComments);
         } else {
             setFavoriteMovies([]);
         }
-    }, [profileUser, allMovies]);
+    }, [profileUser, allMovies]); // Re-run when profileUser or allMovies change
 
 
     const handleEditClick = () => {
@@ -93,19 +109,19 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
         }
 
        // Always include username, email, and birthday, as they are either required
-        // or part of the standard profile data. Password is optional.
-        const updatedData = {
-            username: username,
-            email: email,
-            birthday: birthday // This will be an empty string if not set, which is fine for optional.
-        };
+       // or part of the standard profile data. Password is optional.
+       const updatedData = {
+           username: username,
+           email: email,
+           birthday: birthday // This will be an empty string if not set, which is fine for optional.
+       };
 
-        // Only include password if it's not empty, as backend allows it to be optional.
-        if (password) {
-            updatedData.password = password;
-        }
-       
-        fetch(`https://oscars2025-f0070acec0c4.herokuapp.com/users/${profileUser.username}`, {
+       // Only include password if it's not empty, as backend allows it to be optional.
+       if (password) {
+           updatedData.password = password;
+       }
+        
+        fetch(`${API_BASE_URL}/users/${profileUser.username}`, { // Use API_BASE_URL
             method: 'PUT',
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -154,7 +170,7 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
         if (!token || !profileUser) return;
 
         if (window.confirm('Are you sure you want to deregister your account? This action cannot be undone.')) {
-            fetch(`https://oscars2025-f0070acec0c4.herokuapp.com/users/${profileUser.username}`, {
+            fetch(`${API_BASE_URL}/users/${profileUser.username}`, { // Use API_BASE_URL
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` },
             })
@@ -260,13 +276,25 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
 
                     <h2 className="mt-4">Your Favorite Movies</h2>
                     <Row xs={1} md={2} lg={3} className="g-4">
-                        {favoriteMovies.map((movie) => (
-                            <Col key={movie._id?.$oid || movie._id}>
-                                {/* Pass user, token, and onUserUpdate to MovieCard for favorite toggling within profile */}
-                                <MovieCard movie={movie} user={profileUser} token={token} onUserUpdate={onUserUpdate} />
-                            </Col>
-                        ))}
-                        {favoriteMovies.length === 0 && <Col>No favorite movies added yet.</Col>}
+                        {favoriteMovies.length === 0 ? (
+                            <Col>No favorite movies added yet.</Col>
+                        ) : (
+                            favoriteMovies.map((movie) => (
+                                <Col key={movie._id?.$oid || movie._id}>
+                                    {/* Pass user, token, and onUserUpdate to MovieCard for favorite toggling within profile */}
+                                    <MovieCard movie={movie} user={profileUser} token={token} onUserUpdate={onUserUpdate} />
+                                    {/* Display the user's comment if it exists */}
+                                    {movie.userComment && (
+                                        <Card className="mt-2 text-center" style={{ backgroundColor: '#333', borderColor: '#444' }}>
+                                            <Card.Body className="p-2">
+                                                <small style={{ color: '#ccc' }}>Your Review:</small>
+                                                <p className="mb-0" style={{ fontSize: '0.9rem' }}>{movie.userComment}</p>
+                                            </Card.Body>
+                                        </Card>
+                                    )}
+                                </Col>
+                            ))
+                        )}
                     </Row>
                 </Col>
             </Row>
