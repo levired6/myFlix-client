@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } => 'react';
 import PropTypes from 'prop-types';
 import { Card, Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
@@ -7,33 +7,35 @@ const API_BASE_URL = 'https://oscars2025-f0070acec0c4.herokuapp.com';
 
 export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
     // Determine if the movie is currently a favorite for the logged-in user
-    const [isFavorite, setIsFavorite] = useState(
-        user && user.favoriteMovies && movie && movie._id ?
-        user.favoriteMovies.some(fav => fav.movieId === (movie._id?.$oid || movie._id)) :
-        false
-    );
-
-    // State to hold the comment for this movie
+    // Initialize based on the user prop's favoriteMovies structure
+    const [isFavorite, setIsFavorite] = useState(false);
     const [commentText, setCommentText] = useState('');
 
-    // Effect to set the initial comment text if the movie is already a favorite
+    // Effect to synchronize isFavorite and commentText with the 'user' prop
     useEffect(() => {
         if (user && user.favoriteMovies && movie && movie._id) {
-            const favoriteEntry = user.favoriteMovies.find(fav => fav.movieId === (movie._id?.$oid || movie._id));
+            const movieId = movie._id?.$oid || movie._id;
+            const favoriteEntry = user.favoriteMovies.find(fav => 
+                fav.movieId && ((fav.movieId._id && fav.movieId._id.toString()) === movieId || fav.movieId === movieId)
+            );
+
             if (favoriteEntry) {
-                setCommentText(favoriteEntry.comment || ''); // Set existing comment or empty string
                 setIsFavorite(true);
+                setCommentText(favoriteEntry.comment || ''); 
             } else {
                 setIsFavorite(false);
-                setCommentText(''); // Clear comment if not a favorite
+                setCommentText(''); 
             }
+        } else {
+            setIsFavorite(false);
+            setCommentText('');
         }
     }, [user, movie]); // Re-run when user or movie props change
 
-    // Handler for adding/removing a movie from favorites
     const handleToggleFavorite = () => {
         if (!token || !user || !movie || !movie._id) {
             console.error("Missing token, user, or movie data for favorite action.");
+            alert("Please log in to add/remove favorites."); // User-friendly alert
             return;
         }
 
@@ -49,34 +51,45 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
             method: method,
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json' // Important for sending JSON body
+                'Content-Type': 'application/json' 
             },
-            body: requestBody // Only include body for POST requests
+            body: requestBody 
         })
             .then((response) => {
+                // IMPORTANT: Check response.ok BEFORE trying to parse JSON
                 if (!response.ok) {
-                    return response.json().then(data => {
-                        throw new Error(data.message || `Failed to update favorites with status: ${response.status}`);
+                    // Try to parse JSON error message, but handle if it's not JSON
+                    return response.text().then(text => { // Use .text() to read raw response
+                        try {
+                            const errorData = JSON.parse(text);
+                            throw new Error(errorData.message || `API Error: ${response.status}`);
+                        } catch (e) {
+                            // If parsing fails, use the raw text or a generic message
+                            throw new Error(`Non-JSON API Error: ${text || response.statusText || response.status}`);
+                        }
                     });
                 }
-                return response.json();
+                return response.json(); // Only parse as JSON if response.ok is true
             })
             .then((updatedUser) => {
                 // Update local storage and parent component's user state
                 localStorage.setItem('user', JSON.stringify(updatedUser));
                 if (onUserUpdate) {
-                    onUserUpdate(updatedUser);
+                    onUserUpdate(updatedUser); // This is crucial for ProfileView to re-render
                 }
-                // Update favorite status and comment text based on response
-                setIsFavorite(!isFavorite); // Toggle favorite status
-                
-                // If it was added, ensure comment is set from input; if removed, clear it.
-                if (!isFavorite) { // If it was just added
-                    const newFavEntry = updatedUser.favoriteMovies.find(fav => fav.movieId === movieId);
+
+                // Update local state based on the action performed
+                if (method === 'POST') {
+                    setIsFavorite(true);
+                    // Find the newly added favorite entry in the updatedUser object
+                    const newFavEntry = updatedUser.favoriteMovies.find(fav => 
+                        fav.movieId && ((fav.movieId._id && fav.movieId._id.toString()) === movieId || fav.movieId === movieId)
+                    );
                     setCommentText(newFavEntry ? newFavEntry.comment : '');
                     alert(`Movie "${movie.title}" added to favorites with your comment!`);
-                } else { // If it was just removed
-                    setCommentText(''); // Clear comment field
+                } else { // method === 'DELETE'
+                    setIsFavorite(false);
+                    setCommentText(''); // Clear comment field when removed
                     alert(`Movie "${movie.title}" removed from favorites!`);
                 }
             })
@@ -93,7 +106,6 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
                     variant="top"
                     src={`${API_BASE_URL}/${movie.imageURL}`}
                     alt={movie.title}
-                    // Styling for movie card image to fit properly
                     style={{ height: '300px', objectFit: 'cover', width: '100%' }}
                 />
             </Link>
@@ -101,10 +113,10 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
                 <Card.Title>{movie.title}</Card.Title>
                 <Card.Text className="flex-grow-1">{movie.director.name}</Card.Text>
 
-                {/* Comment Input and Favorite Button */}
                 <div className="mt-auto">
                     {/* Conditional rendering for comment input field */}
-                    {!isFavorite && ( // Show input only when NOT a favorite (i.e., when user is about to add)
+                    {/* Show input if NOT a favorite, or if it IS a favorite AND has a comment (for editing existing comments later if desired) */}
+                    {(!isFavorite || (isFavorite && commentText)) && (
                         <Form.Group className="mb-2">
                             <Form.Control
                                 as="textarea"
@@ -121,7 +133,7 @@ export const MovieCard = ({ movie, user, token, onUserUpdate }) => {
                     <Button
                         variant={isFavorite ? 'danger' : 'outline-danger'}
                         onClick={handleToggleFavorite}
-                        className="favorite-toggle-button w-100" // Ensure button takes full width
+                        className="favorite-toggle-button w-100"
                     >
                         {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
                     </Button>
