@@ -8,46 +8,46 @@ const API_BASE_URL = 'https://oscars2025-f0070acec0c4.herokuapp.com';
 
 // Accept user, token, onUserUpdate, and onLoggedOut as props
 export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
-    // Renamed local state to profileUser to avoid confusion with the prop 'user'
-    const [profileUser, setProfileUser] = useState(user);
-    const [allMovies, setAllMovies] = useState([]); // Fetched all movies within ProfileView
-    // favoriteMovies will now store objects that combine movie data and the user's comment
-    const [favoriteMovies, setFavoriteMovies] = useState([]); 
-    const [isEditing, setIsEditing] = useState(false);
+    // profileUser state is now strictly derived from the 'user' prop
+    // This removes a potential layer of delayed updates.
+    // However, we still use local state for form fields which can be edited.
+    const [allMovies, setAllMovies] = useState([]); 
+    const [favoriteMoviesDetails, setFavoriteMoviesDetails] = useState([]);
 
-    // Initialize form fields directly from the 'user' prop
+    // Form states for editing, initialized directly from 'user' prop
+    const [isEditing, setIsEditing] = useState(false);
     const [username, setUsername] = useState(user?.username || '');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState(user?.email || '');
-    // Convert birthday to YYYY-MM-DD format for date input
     const [birthday, setBirthday] = useState(user?.birthday ? new Date(user.birthday).toISOString().split('T')[0] : ''); 
     const navigate = useNavigate();
 
-    // Effect to set initial form values and *re-sync* if 'user' prop changes
+    // Effect to keep form fields in sync with the 'user' prop (when user object changes)
     useEffect(() => {
         if (user) {
-            setProfileUser(user);
             setUsername(user.username);
             setEmail(user.email);
             setBirthday(user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
+            // Do not reset password field here, it's for input only
         }
     }, [user]); // Depend on the 'user' prop from MyFlixApplication
 
-    // Effect to fetch all movies (This part is mostly correct, just for context)
+    // Effect to fetch all movies
     useEffect(() => {
         if (!token) {
             console.log("ProfileView: Token not found, cannot fetch all movies. Redirecting to login.");
-            navigate('/login'); // Redirect if no token
+            onLoggedOut(); 
             return;
         }
-        fetch(`${API_BASE_URL}/movies`, { // Use API_BASE_URL variable
+
+        fetch(`${API_BASE_URL}/movies`, {
             headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
             if (!response.ok) {
                 if (response.status === 401) {
                     console.error("Unauthorized: Token expired or invalid during movie fetch in ProfileView.");
-                    onLoggedOut(); // Use the prop to log out
+                    onLoggedOut();
                     return;
                 }
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -55,36 +55,51 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
             return response.json();
         })
         .then((data) => {
+            console.log("ProfileView: All movies fetched successfully.");
             setAllMovies(data);
         })
         .catch((error) => console.error('Error fetching all movies in ProfileView:', error));
-    }, [token, navigate, onLoggedOut]); // Added onLoggedOut to dependency array
+    }, [token, onLoggedOut]);
 
-    // Effect to filter favorite movies and attach comments (depends on profileUser and allMovies state)
-    // IMPORTANT: This now maps over profileUser.favoriteMovies (which includes comments)
-    // and finds the full movie object from allMovies, then combines them.
+    // Effect to filter and prepare favorite movies details
+    // This useEffect now directly uses the 'user' prop from the parent.
     useEffect(() => {
-        if (profileUser && allMovies.length > 0 && profileUser.favoriteMovies) {
-            const favMoviesWithComments = profileUser.favoriteMovies
+        console.log("ProfileView useEffect: Recalculating favorite movies details...");
+        console.log("  Current 'user' prop:", user);
+        console.log("  All Movies length:", allMovies.length);
+
+        if (user && allMovies.length > 0 && user.favoriteMovies) {
+            const favMoviesWithDetails = user.favoriteMovies
                 .map(favEntry => {
-                    const movieId = favEntry.movieId?.$oid || favEntry.movieId; // Handle both direct ID and $oid
-                    const movieData = allMovies.find(movie => 
-                        (movie._id?.$oid || movie._id) === movieId
-                    );
-                    if (movieData) {
-                        // Return a new object that combines movie data with the user's comment
-                        return { ...movieData, userComment: favEntry.comment };
+                    // Defensive check for favEntry and favEntry.movieId
+                    if (!favEntry || !favEntry.movieId) {
+                        console.warn("Skipping malformed favorite entry:", favEntry);
+                        return null;
                     }
-                    return null; // Handle case where movie data isn't found in allMovies (e.g., deleted movie)
+
+                    // Normalize movieId to string for consistent comparison
+                    // Handle both direct ID string and populated object IDs
+                    const favMovieId = (favEntry.movieId._id && favEntry.movieId._id.toString()) || favEntry.movieId.toString(); 
+                    
+                    const movieData = allMovies.find(movie => 
+                        (movie._id?.$oid || movie._id) === favMovieId
+                    );
+
+                    if (movieData) {
+                        return { ...movieData, userComment: favEntry.comment || '' };
+                    }
+                    console.warn(`Movie data not found for favorite ID: ${favMovieId}`);
+                    return null;
                 })
-                .filter(Boolean); // Remove any null entries from the map
+                .filter(Boolean); // Remove any null entries
 
-            setFavoriteMovies(favMoviesWithComments);
+            console.log("ProfileView: Calculated favoriteMoviesDetails", favMoviesWithDetails);
+            setFavoriteMoviesDetails(favMoviesWithDetails);
         } else {
-            setFavoriteMovies([]);
+            console.log("ProfileView: Clearing favoriteMoviesDetails (conditions not met or no favorites).");
+            setFavoriteMoviesDetails([]);
         }
-    }, [profileUser, allMovies]); // Re-run when profileUser or allMovies change
-
+    }, [user, allMovies]); // IMPORTANT: Now directly depends on 'user' prop
 
     const handleEditClick = () => {
         setIsEditing(true);
@@ -92,36 +107,33 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
 
     const handleCancelEdit = () => {
         setIsEditing(false);
-        // Reset form fields to current profileUser state values
-        setUsername(profileUser.username);
-        setEmail(profileUser.email);
-        setBirthday(profileUser.birthday ? new Date(profileUser.birthday).toISOString().split('T')[0] : '');
+        // Reset form fields to current user prop values
+        setUsername(user.username);
+        setEmail(user.email);
+        setBirthday(user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
         setPassword('');
     };
 
     const handleUpdateUser = (event) => {
         event.preventDefault();
 
-        if (!token || !profileUser) {
+        if (!token || !user) {
           alert('User data or token missing. Please log in again.');
-          onLoggedOut(); // Attempt to log out if essential data is missing
+          onLoggedOut();
           return;
         }
 
-       // Always include username, email, and birthday, as they are either required
-       // or part of the standard profile data. Password is optional.
        const updatedData = {
            username: username,
            email: email,
-           birthday: birthday // This will be an empty string if not set, which is fine for optional.
+           birthday: birthday 
        };
 
-       // Only include password if it's not empty, as backend allows it to be optional.
        if (password) {
            updatedData.password = password;
        }
         
-        fetch(`${API_BASE_URL}/users/${profileUser.username}`, { // Use API_BASE_URL
+        fetch(`${API_BASE_URL}/users/${user.username}`, { // Use 'user.username' from prop
             method: 'PUT',
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -131,12 +143,6 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
         })
         .then((response) => {
             if (!response.ok) {
-                if (response.status === 401) {
-                    console.error("Unauthorized: Token expired or invalid during profile update.");
-                    onLoggedOut();
-                    return;
-                }
-                 // Parse JSON error response from backend for 400/422 status codes
                 return response.json().then(data => {
                     const errorMessage = data.errors ?
                                          data.errors.map(err => err.msg).join('\n') :
@@ -147,18 +153,14 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
             return response.json();
         })
         .then((updatedUser) => {
-            setProfileUser(updatedUser);// Update local state
+            // This is critical: Call onUserUpdate to update the parent state (MyFlixApplication)
+            // which then re-propagates the new user object down to ProfileView.
             if (onUserUpdate) {
-                onUserUpdate(updatedUser);// Update parent state (MyFlixApplication)
+                onUserUpdate(updatedUser); 
             }
             setIsEditing(false);
-            setPassword('');// Clear password field after successful update
+            setPassword('');
             alert('Profile updated successfully!');
-             // If username changed, consider navigating to the new profile URL to reflect the change
-            // This is robust, but for a simple profile update, it might not be strictly necessary if the parent handles user state.
-            // if (updatedData.username && updatedData.username !== profileUser.username) {
-            //     navigate(`/users/${updatedData.username}`); // Navigate to new username's profile
-            // }
         })
         .catch((error) => {
             console.error('Error updating user:', error);
@@ -167,10 +169,10 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
     };
 
     const handleDeleteUser = () => {
-        if (!token || !profileUser) return;
+        if (!token || !user) return; // Use 'user' prop directly
 
         if (window.confirm('Are you sure you want to deregister your account? This action cannot be undone.')) {
-            fetch(`${API_BASE_URL}/users/${profileUser.username}`, { // Use API_BASE_URL
+            fetch(`${API_BASE_URL}/users/${user.username}`, { // Use 'user.username' from prop
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` },
             })
@@ -178,7 +180,7 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
                 if (response.ok) {
                     alert('Your account has been successfully deregistered.');
                     if (onLoggedOut) {
-                        onLoggedOut();
+                        onLoggedOut(); // Log out from the parent component
                     }
                 } else {
                     return response.json().then(data => {
@@ -193,7 +195,7 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
         }
     };
 
-    // Render a loading state if 'user' prop is null initially
+    // Use 'user' prop directly for initial loading check
     if (!user) {
         return <Container>Loading profile data... If you're not logged in, please log in.</Container>;
     }
@@ -201,7 +203,7 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
     return (
         <Container className="mt-5">
             <Row className="justify-content-md-center">
-                <Col md={8}> {/* Increased column size for better layout */}
+                <Col md={8}>
                     <Card>
                         <Card.Header>Your Profile</Card.Header>
                         <Card.Body>
@@ -224,7 +226,6 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
                                             type="password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            // minLength="8" // Consider adding password length validation
                                         />
                                         <Form.Text className="text-muted">
                                             Leave blank to keep current password.
@@ -247,7 +248,6 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
                                             type="date"
                                             value={birthday}
                                             onChange={(e) => setBirthday(e.target.value)}
-                                            // required // Birthday might not be strictly required.
                                         />
                                     </Form.Group>
 
@@ -256,14 +256,14 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
                                 </Form>
                             ) : (
                                 <>
-                                    <Card.Text><strong>Username:</strong> {profileUser.username}</Card.Text>
-                                    <Card.Text><strong>Email:</strong> {profileUser.email}</Card.Text>
-                                    <Card.Text><strong>Birthday:</strong> {profileUser.birthday ?
-                                            new Date(profileUser.birthday.split('T')[0] + 'T00:00:00').toLocaleDateString('en-US', {
+                                    <Card.Text><strong>Username:</strong> {user.username}</Card.Text> {/* Use 'user' prop */}
+                                    <Card.Text><strong>Email:</strong> {user.email}</Card.Text> {/* Use 'user' prop */}
+                                    <Card.Text><strong>Birthday:</strong> {user.birthday ? // Use 'user' prop
+                                            new Date(user.birthday.split('T')[0] + 'T00:00:00').toLocaleDateString('en-US', {
                                                 year: 'numeric',
                                                 month: '2-digit',
                                                 day: '2-digit',
-                                                timeZone: 'UTC' // Crucially, tell it to format as if it's UTC
+                                                timeZone: 'UTC' 
                                             })
                                             : 'N/A'
                                         }</Card.Text>
@@ -276,13 +276,14 @@ export const ProfileView = ({ user, token, onUserUpdate, onLoggedOut }) => {
 
                     <h2 className="mt-4">Your Favorite Movies</h2>
                     <Row xs={1} md={2} lg={3} className="g-4">
-                        {favoriteMovies.length === 0 ? (
+                        {favoriteMoviesDetails.length === 0 ? (
                             <Col>No favorite movies added yet.</Col>
                         ) : (
-                            favoriteMovies.map((movie) => (
+                            favoriteMoviesDetails.map((movie) => (
                                 <Col key={movie._id?.$oid || movie._id}>
-                                    {/* Pass user, token, and onUserUpdate to MovieCard for favorite toggling within profile */}
-                                    <MovieCard movie={movie} user={profileUser} token={token} onUserUpdate={onUserUpdate} />
+                                    {/* Pass movie data (which now includes userComment) and user/token/onUserUpdate */}
+                                    {/* Ensure MovieCard gets the LATEST 'user' prop */}
+                                    <MovieCard movie={movie} user={user} token={token} onUserUpdate={onUserUpdate} />
                                     {/* Display the user's comment if it exists */}
                                     {movie.userComment && (
                                         <Card className="mt-2 text-center" style={{ backgroundColor: '#333', borderColor: '#444' }}>
