@@ -1,4 +1,4 @@
-import React, { useState, useEffect } => 'react';
+import React, { useState, useEffect } from 'react'; // CORRECTED: Changed '=>' to 'from'
 import PropTypes from 'prop-types';
 import { Card, Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
